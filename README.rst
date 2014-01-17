@@ -1,14 +1,15 @@
 Make a simple RPM file
 ======================
 
-This python script makes a simple rpm from a list of files passed as positional parameters.
+This python script makes a simple RPM file from a list of 
+files passed as positional parameters.
 
-For example, make an RPM file named ``mksimplerpm``::
+For example, make an RPM file named ``mksimplerpm`` out of this script::
 
-    ./mksimplerpm -s 'Make an rpm' -d /bin -n makesimplerpm -v 0.1 mksimplerpm.py:mksimplerpm
+    ./mksimplerpm.py -s 'Make an rpm' -d /bin -n makesimplerpm -v 0.1 mksimplerpm.py:mksimplerpm
 
-This will make an RPM file ``mksimplerpm-0.1`` add a summary/description 'Make
-an rpm', and add the ``mksimplerpm.py`` file which will be renamed
+This will make an RPM file ``mksimplerpm-0.1`` add a summary/description *Make
+an rpm*, and add the ``mksimplerpm.py`` file which will be renamed
 ``mksimplerpm`` and installed in ``/bin``.
 
 Usage::
