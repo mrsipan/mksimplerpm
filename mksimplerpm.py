@@ -41,12 +41,12 @@ def main(args=None):
         print >> sys.stderr, "No files provided"
         return 7
     else:
-        for arg in args:
+        for filename in args:
             if ':' in arg:
-                k, v = arg.split(':', 1)
-                args_dict[k] = v
+                curr_name, new_name = filename.split(':', 1)
+                args_dict[curr_name] = new_name
             else:
-                args_dict[arg] = arg
+                args_dict[filename] = filename
 
     name = '%s-%s' % (settings.rpm_name, settings.version)
 
