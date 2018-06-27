@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import shlex
 
+DEFAULT_DESTINATION = '/usr/bin'
 
 def main(args=None):
     args = args or sys.argv
@@ -23,7 +24,8 @@ def main(args=None):
     parser.add_option('-s', '--summary', action='store', dest='summary',
                       default=None, help='short rpm description')
     parser.add_option('-d', '--directory', action='store', dest='directory',
-                      default='/usr/local/bin', help='Destination directory of scripts')
+                      default=DEFAULT_DESTINATION,
+                      help='Destination directory of scripts')
     parser.add_option('-o', '--only-src', action='store_true', dest='only_src',
                       help='make only source rpm')
 
@@ -40,13 +42,6 @@ def main(args=None):
     if not args:
         print >> sys.stderr, "No files provided"
         return 7
-    else:
-        for filename in args:
-            if ':' in arg:
-                curr_name, new_name = filename.split(':', 1)
-                args_dict[curr_name] = new_name
-            else:
-                args_dict[filename] = filename
 
     name = '%s-%s' % (settings.rpm_name, settings.version)
 
@@ -54,8 +49,23 @@ def main(args=None):
     todir = os.path.join(tmpdir, name)
     os.mkdir(todir)
 
-    for old_name, new_name in args_dict.items():
-        shutil.copyfile(old_name, os.path.join(todir, new_name))
+    for filename in args:
+        if ':' in filename:
+            curr_name, new_name = filename.split(':', 1)
+
+            if new_name.startswith('/'):
+                args_dict[curr_name] = new_name
+            else:
+                args_dict[curr_name] = os.path.join(settings.directory, new_name)
+
+        else:
+            args_dict[filename] = os.path.join(settings.directory, filename)
+
+
+    for curr_name, destination_path in args_dict.items():
+
+        os.makedirs(os.path.dirname(os.path.normpath(todir + destination_path)))
+        shutil.copyfile(curr_name, os.path.normpath(todir + destination_path))
 
     spec_path = os.path.join(todir, '%s.spec' % settings.rpm_name)
     spec_templ = string.Template(spec_template)
@@ -67,7 +77,7 @@ def main(args=None):
                 name=settings.rpm_name,
                 version=settings.version,
                 summary=settings.summary or "rpm summary",
-                files=' '.join([os.path.basename(arg) for arg in args_dict.values()]),
+                files='\n'.join(args_dict.values()),
                 requires=settings.requires,
                 directory=settings.directory
                 )
@@ -148,11 +158,11 @@ printf "No build\\n"
 
 %install
 test -d $$RPM_BUILD_ROOT && rm -rf $$RPM_BUILD_ROOT
-mkdir -p $$RPM_BUILD_ROOT/${directory}
-files="${files}"
-for file in $$files; do
-  mv $$file "$$RPM_BUILD_ROOT/${directory}/$$file"
-done
+mkdir -p $$RPM_BUILD_ROOT
+rm ${name}.spec
+find usr/bin -type f -exec chmod 755 {} \;
+find etc -type f -exec chmod 644 {} \;
+mv * "$$RPM_BUILD_ROOT"
 
 %pre
 printf "no much here\\n"
@@ -161,12 +171,11 @@ printf "no much here\\n"
 rm -rf %RPM_BUILD_ROOT
 
 %files
-%defattr(755, root, root, -)
-${directory}/*
-
+%defattr(-, root, root, -)
+${files}
 
 %changelog
-* Tue Aug 09 2011 Ben Sanchez
+* Tue Aug 09 2018 mrsipan
 - Created by mksimplerpm
 '''
 
