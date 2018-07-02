@@ -100,10 +100,9 @@ def main(args=None):
             return 9
 
         retcode = subprocess.call(
-            shlex.split(
-                '/usr/bin/rpmbuild -bs --nodeps --define "_sourcedir ."'
-                ' --define "_srcrpmdir ." %s/%s.spec' % (name, settings.rpm_name)
-                )
+            'rpmbuild -bs --nodeps --define "_sourcedir ."'
+            ' --define "_srcrpmdir ." %s/%s.spec' % (name, settings.rpm_name),
+            shell=True
             )
 
         if settings.only_src or retcode != 0:
@@ -114,9 +113,9 @@ def main(args=None):
 
         src_rpm, = set(find(tmpdir, ext='.src.rpm'))
         return subprocess.call(
-            shlex.split(
-                '/usr/bin/rpmbuild --rebuild'
-                ' --define "%%_topdir %s" %s' % (tmpdir, src_rpm))
+            'rpmbuild --rebuild'
+            ' --define "%%_topdir %s" %s' % (tmpdir, src_rpm),
+            shell=True
             )
 
     finally:
