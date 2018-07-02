@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import os
 import sys
 import tarfile
@@ -40,10 +41,10 @@ def main(args=None):
 
     args_dict = {}
     if not args:
-        print >> sys.stderr, "No files provided"
+        print('No files provided', file=sys.stderr)
         return 7
 
-    name = '%s-%s' % (settings.rpm_name, settings.version)
+    name = '{}-{}'.format(settings.rpm_name, settings.version)
 
     tmpdir = tempfile.mkdtemp(suffix='.mksimplerpm-%s' % settings.rpm_name)
     todir = os.path.join(tmpdir, name)
@@ -60,7 +61,6 @@ def main(args=None):
 
         else:
             args_dict[filename] = os.path.join(settings.directory, filename)
-
 
     for curr_name, destination_path in args_dict.items():
 
@@ -95,7 +95,7 @@ def main(args=None):
             tar.close()
 
         if not os.path.exists('/usr/bin/rpmbuild'):
-            print >> sys.stderr, '`rpmbuild` is not installed: yum install rpm-build'
+            print('`rpmbuild` is not installed: yum install rpm-build', file=sys.stderr)
             return 9
 
         retcode = subprocess.call(
