@@ -1,15 +1,16 @@
 #!/usr/bin/python
 
 from __future__ import print_function
+import distutils.spawn
+import optparse
 import os
+import shlex
+import shutil
+import string
+import subprocess
 import sys
 import tarfile
 import tempfile
-import string
-import optparse
-import shutil
-import subprocess
-import shlex
 
 DEFAULT_DESTINATION = '/usr/bin'
 
@@ -94,7 +95,7 @@ def main(args=None):
         finally:
             tar.close()
 
-        if not os.path.exists('/usr/bin/rpmbuild'):
+        if not distutils.spawn.find_executable('rpmbuild'):
             print('`rpmbuild` is not installed: yum install rpm-build', file=sys.stderr)
             return 9
 
