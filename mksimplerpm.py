@@ -160,8 +160,8 @@ printf "No build\\n"
 test -d $$RPM_BUILD_ROOT && rm -rf $$RPM_BUILD_ROOT
 mkdir -p $$RPM_BUILD_ROOT
 rm ${name}.spec
-find usr/bin -type f -exec chmod 755 {} \;
-find etc -type f -exec chmod 644 {} \;
+# find usr/bin -type f -exec chmod 755 {} \;
+# find etc -type f -exec chmod 644 {} \;
 mv * "$$RPM_BUILD_ROOT"
 
 %pre
